@@ -1,0 +1,29 @@
+.dashboard-container {
+  max-width: 600px;
+  margin: auto;
+  padding: 20px;
+}
+
+.add-task {
+  margin-top: 20px;
+}
+
+.task-list {
+  margin-top: 20px;
+  list-style: none;
+  padding: 0;
+}
+
+.task-item {
+  margin-bottom: 10px;
+}
+
+.task-button {
+  margin-left: 8px;
+}
+
+.due-date {
+  margin-left: 6px;
+  font-style: italic;
+  color: #555;
+}
