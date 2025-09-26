@@ -19,7 +19,7 @@ function Dashboard() {
       return;
     }
 
-    axios.get('http://localhost:5000/api/tasks', {
+    axios.get('https://taskflow-backend-h3uu.onrender.com', {
       headers: { Authorization: `Bearer ${token}` }
     })
     .then(res => {
@@ -40,7 +40,7 @@ function Dashboard() {
   const addTask = async () => {
     if (!newTask.trim()) return;
     const token = localStorage.getItem('token');
-    const res = await axios.post('http://localhost:5000/api/tasks',
+    const res = await axios.post('https://taskflow-backend-h3uu.onrender.com',
       { title: newTask, dueDate, priority },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -54,7 +54,7 @@ function Dashboard() {
 
   const toggleTask = async (id, completed) => {
     const token = localStorage.getItem('token');
-    const res = await axios.put(`http://localhost:5000/api/tasks/${id}`,
+    const res = await axios.put(`https://taskflow-backend-h3uu.onrender.com${id}`,
       { completed: !completed },
       { headers: { Authorization: `Bearer ${token}` } }
     );
@@ -65,7 +65,7 @@ function Dashboard() {
 
   const deleteTask = async (id) => {
     const token = localStorage.getItem('token');
-    const res = await axios.delete(`http://localhost:5000/api/tasks/${id}`, {
+    const res = await axios.delete(`https://taskflow-backend-h3uu.onrender.com${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     if (res.data?.success) {
@@ -83,7 +83,7 @@ function Dashboard() {
     const original = tasks.find(t => t._id === id);
     if (!editedTitle.trim()) return alert("Title can't be empty");
 
-    const res = await axios.put(`http://localhost:5000/api/tasks/${id}`,
+    const res = await axios.put(`https://taskflow-backend-h3uu.onrender.com${id}`,
       { ...original, title: editedTitle },
       { headers: { Authorization: `Bearer ${token}` } }
     );
