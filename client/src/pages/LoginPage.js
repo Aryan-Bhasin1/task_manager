@@ -24,7 +24,7 @@ function LoginPage() {
       return;
     }
     try {
-      const res = await axios.post('https://taskflow-backend-h3uu.onrender.com', { username, password });
+      const res = await axios.post('https://taskflow-backend-h3uu.onrender.com/api/auth/login', { username, password });
       localStorage.setItem('token', res.data.token); // store token for auth
       navigate('/dashboard'); // redirect after login
     } catch (err) {

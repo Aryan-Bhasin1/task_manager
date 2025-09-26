@@ -25,7 +25,7 @@ function RegisterPage() {
       return;
     }
     try {
-      await axios.post('https://taskflow-backend-h3uu.onrender.com', { username, password });
+      await axios.post('https://taskflow-backend-h3uu.onrender.com/api/auth/register', { username, password });
       alert('Account created! You can now log in.');
       navigate('/login'); // redirect to login page
     } catch (err) {
