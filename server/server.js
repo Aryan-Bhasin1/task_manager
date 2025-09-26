@@ -1,6 +1,10 @@
 // Load environment variables first
 require('dotenv').config();
 
+app.get('/', (req, res) => {
+  res.send('TaskFlow API is running 🚀');
+});
+
 // Import dependencies
 const express = require('express');
 const cors = require('cors');
