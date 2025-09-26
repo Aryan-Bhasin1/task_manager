@@ -1,10 +1,6 @@
 // Load environment variables first
 require('dotenv').config();
 
-app.get('/', (req, res) => {
-  res.send('TaskFlow API is running 🚀');
-});
-
 // Import dependencies
 const express = require('express');
 const cors = require('cors');
@@ -12,6 +8,10 @@ const mongoose = require('mongoose');
 
 // Create the Express app
 const app = express();
+
+app.get('/', (req, res) => {
+  res.send('TaskFlow API is running 🚀');
+});
 
 // Middleware
 app.use(cors());
