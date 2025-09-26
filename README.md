@@ -21,3 +21,7 @@ Backend
 - Mongoose (ODM)
 - JWT (authentication)
 - bcrypt.js (password hashing)
+
+- To WDS: Please install code, CD into client and run NPM install, then NPM start. You can register, but if that doesn't work please use:
+- username: admin
+- password: password123
