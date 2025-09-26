@@ -8,7 +8,7 @@ Users can register, log in, and manage their tasks with features like add, edit,
 - ✏️ Edit Tasks inline
 - ✅ Mark Tasks as Complete/Incomplete
 - ❌ Delete Tasks
-- 📅 Due Date Display
+- 📅 Due Date Display/Overdue Warning
 - 🔒 Protected Routes (only logged‑in users can access dashboard)
 
 🛠️ Tech Stack

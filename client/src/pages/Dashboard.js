@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import './Dashboard.css'; // 👈 import the CSS file
+import './Dashboard.css';
 
 function Dashboard() {
   const [tasks, setTasks] = useState([]);
   const [newTask, setNewTask] = useState('');
   const [dueDate, setDueDate] = useState('');
+  const [priority, setPriority] = useState('');
   const [editingTaskId, setEditingTaskId] = useState(null);
   const [editedTitle, setEditedTitle] = useState('');
   const navigate = useNavigate();
 
-  // Fetch tasks on load
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (!token) {
@@ -22,64 +22,80 @@ function Dashboard() {
     axios.get('http://localhost:5000/api/tasks', {
       headers: { Authorization: `Bearer ${token}` }
     })
-    .then(res => setTasks(res.data))
+    .then(res => {
+      if (Array.isArray(res.data)) {
+        setTasks(res.data);
+      } else {
+        console.error("Unexpected response:", res.data);
+        setTasks([]);
+      }
+    })
     .catch(err => {
-      console.error(err);
+      console.error("Fetch error:", err);
       localStorage.removeItem('token');
       navigate('/');
     });
   }, [navigate]);
 
-  // Add new task
   const addTask = async () => {
-    if (!newTask) return;
+    if (!newTask.trim()) return;
     const token = localStorage.getItem('token');
     const res = await axios.post('http://localhost:5000/api/tasks',
-      { title: newTask, dueDate },
+      { title: newTask, dueDate, priority },
       { headers: { Authorization: `Bearer ${token}` } }
     );
-    setTasks([...tasks, res.data]);
-    setNewTask('');
-    setDueDate('');
+    if (res.data && res.data._id) {
+      setTasks([...tasks, res.data]);
+      setNewTask('');
+      setDueDate('');
+      setPriority('');
+    }
   };
 
-  // Toggle completion
   const toggleTask = async (id, completed) => {
     const token = localStorage.getItem('token');
     const res = await axios.put(`http://localhost:5000/api/tasks/${id}`,
       { completed: !completed },
       { headers: { Authorization: `Bearer ${token}` } }
     );
-    setTasks(tasks.map(t => (t._id === id ? res.data : t)));
+    if (res.data && res.data._id) {
+      setTasks(tasks.map(t => (t._id === id ? res.data : t)));
+    }
   };
 
-  // Delete task
   const deleteTask = async (id) => {
     const token = localStorage.getItem('token');
-    await axios.delete(`http://localhost:5000/api/tasks/${id}`, {
+    const res = await axios.delete(`http://localhost:5000/api/tasks/${id}`, {
       headers: { Authorization: `Bearer ${token}` }
     });
-    setTasks(tasks.filter(t => t._id !== id));
+    if (res.data?.success) {
+      setTasks(tasks.filter(t => t._id !== id));
+    }
   };
 
-  // Start editing
   const startEditing = (task) => {
     setEditingTaskId(task._id);
     setEditedTitle(task.title);
   };
 
-  // Save edit
   const saveEdit = async (id) => {
     const token = localStorage.getItem('token');
+    const original = tasks.find(t => t._id === id);
+    if (!editedTitle.trim()) return alert("Title can't be empty");
+
     const res = await axios.put(`http://localhost:5000/api/tasks/${id}`,
-      { title: editedTitle },
+      { ...original, title: editedTitle },
       { headers: { Authorization: `Bearer ${token}` } }
     );
-    setTasks(tasks.map(t => (t._id === id ? res.data : t)));
-    setEditingTaskId(null);
+
+    if (res.data && res.data._id) {
+      setTasks(tasks.map(t => (t._id === id ? res.data : t)));
+      setEditingTaskId(null);
+    } else {
+      console.error("Failed to update task:", res.data);
+    }
   };
 
-  // Logout
   const logout = () => {
     localStorage.removeItem('token');
     navigate('/');
@@ -90,7 +106,6 @@ function Dashboard() {
       <h2>Dashboard</h2>
       <button onClick={logout} className="task-button">Logout</button>
 
-      {/* Add Task */}
       <div className="add-task">
         <input
           type="text"
@@ -103,12 +118,20 @@ function Dashboard() {
           value={dueDate}
           onChange={e => setDueDate(e.target.value)}
         />
+        <select
+          value={priority}
+          onChange={e => setPriority(e.target.value)}
+        >
+          <option value="">Priority</option>
+          <option value="High">🔥 High</option>
+          <option value="Medium">⚡ Medium</option>
+          <option value="Low">🧊 Low</option>
+        </select>
         <button onClick={addTask} className="task-button">Add</button>
       </div>
 
-      {/* Task List */}
       <ul className="task-list">
-        {tasks.map(task => (
+        {tasks.map(task => task && (
           <li key={task._id} className="task-item">
             <input
               type="checkbox"
@@ -130,9 +153,32 @@ function Dashboard() {
                 {task.title}
                 {task.dueDate && (
                   <span className="due-date">
-                    (Due: {new Date(task.dueDate).toLocaleDateString()})
+                    (Due: {task.dueDate.split('T')[0]})
                   </span>
                 )}
+                {task.priority && (
+                  <span className={`priority-label ${task.priority.toLowerCase()}`}>
+                    {task.priority === 'High' && '🔥 High'}
+                    {task.priority === 'Medium' && '⚡ Medium'}
+                    {task.priority === 'Low' && '🧊 Low'}
+                  </span>
+                )}
+                {(() => {
+                  const todayISO = new Date().toISOString().split('T')[0];
+                  const taskDueISO = task.dueDate?.split('T')[0];
+                  const isOverdue = taskDueISO && taskDueISO < todayISO;
+
+                  return (
+                    <>
+                      {isOverdue && (
+                        <span className="overdue-alert">⚠️ Overdue</span>
+                      )}
+                      {task.priority === 'High' && isOverdue && (
+                        <span className="urgent-alert">🚨 Urgent!</span>
+                      )}
+                    </>
+                  );
+                })()}
                 <button onClick={() => startEditing(task)} className="task-button">✏️ Edit</button>
               </>
             )}

@@ -33,19 +33,17 @@ router.post('/register', async (req, res) => {
 // POST /api/auth/login
 // Authenticates user and returns a signed JWT token
 router.post('/login', async (req, res) => {
-  // 1. Find user by username
-  const user = await User.findOne({ username: req.body.username });
+  console.log("Login attempt:", req.body); // 👈 log incoming credentials
 
-  // 2. If user not found OR password doesn’t match → reject
+  const user = await User.findOne({ username: req.body.username });
+  console.log("User found:", user); // 👈 log user lookup result
+
   if (!user || !(await bcrypt.compare(req.body.password, user.password))) {
+    console.log("Login failed: invalid credentials"); // 👈 log failure reason
     return res.status(401).send('Invalid credentials');
   }
 
-  // 3. If valid, sign a JWT token with the user’s ID
-  //    process.env.JWT_SECRET must be set in your .env file
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
-
-  // 4. Send token back to client
   res.json({ token });
 });
 

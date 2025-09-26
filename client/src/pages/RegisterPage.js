@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import axios from 'axios';
 import { useNavigate, Link } from 'react-router-dom';
+import './RegisterPage.css';
+
 
 function RegisterPage() {
   // Local state for form inputs
@@ -25,7 +27,7 @@ function RegisterPage() {
     try {
       await axios.post('http://localhost:5000/api/auth/register', { username, password });
       alert('Account created! You can now log in.');
-      navigate('/'); // redirect to login page
+      navigate('/login'); // redirect to login page
     } catch (err) {
       alert('Registration failed. Try a different username.');
     }
@@ -39,22 +41,79 @@ function RegisterPage() {
   // - Password input
   // - Register button
   // - Link to Login page
-  return (
-    <div style={{ maxWidth: '300px', margin: 'auto', padding: '20px' }}>
-      <h2>Register</h2>
-      <input
-        placeholder="Username"
-        onChange={e => setUsername(e.target.value)}
-      />
-      <input
-        placeholder="Password"
-        type="password"
-        onChange={e => setPassword(e.target.value)}
-      />
-      <button onClick={register}>Register</button>
-      <p>Already have an account? <Link to="/">Login here</Link></p>
-    </div>
-  );
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      register();
+    }
+  };
+return (
+  <div style={{
+    maxWidth: '360px',
+    margin: '100px auto',
+    padding: '40px',
+    backgroundColor: '#ffffff',
+    borderRadius: '12px',
+    boxShadow: '0 6px 16px rgba(0, 0, 0, 0.1)',
+    fontFamily: 'Segoe UI, Roboto, sans-serif',
+    textAlign: 'center'
+  }}>
+    <h2 style={{ fontSize: '28px', color: '#333', marginBottom: '20px' }}>Register</h2>
+
+    <input
+      placeholder="Username"
+      onKeyDown={handleKeyDown}
+      onChange={e => setUsername(e.target.value)}
+      style={{
+        width: '100%',
+        padding: '12px',
+        marginBottom: '16px',
+        fontSize: '16px',
+        border: '1px solid #ccc',
+        borderRadius: '8px'
+      }}
+    />
+
+    <input
+      placeholder="Password"
+      type="password"
+      onKeyDown={handleKeyDown}
+      onChange={e => setPassword(e.target.value)}
+      style={{
+        width: '100%',
+        padding: '12px',
+        marginBottom: '20px',
+        fontSize: '16px',
+        border: '1px solid #ccc',
+        borderRadius: '8px'
+      }}
+    />
+
+    <button
+      onClick={register}
+      style={{
+        width: '100%',
+        padding: '12px',
+        fontSize: '16px',
+        backgroundColor: '#0078d4',
+        color: 'white',
+        border: 'none',
+        borderRadius: '8px',
+        cursor: 'pointer',
+        fontWeight: '500',
+        transition: 'background-color 0.2s ease'
+      }}
+      onMouseOver={e => e.target.style.backgroundColor = '#005fa3'}
+      onMouseOut={e => e.target.style.backgroundColor = '#0078d4'}
+    >
+      Register
+    </button>
+
+    <p style={{ fontSize: '14px', color: '#666', marginTop: '16px' }}>
+      Already have an account? <Link to="/login" style={{ color: '#0078d4', textDecoration: 'underline' }}>Login here</Link>
+    </p>
+  </div>
+);
 }
 
 export default RegisterPage;
